@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash,request
+from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
@@ -6,7 +6,6 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import CreatePostForm, RegisterForm, LoginForm, Filter
 from random import choice
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -136,9 +135,9 @@ def index():
             selected_options.append(Cafe.has_wifi == True)
         if form.has_toilet.data:
             selected_options.append(Cafe.has_toilet == True)
-        if form.has_toilet.data:
+        if form.has_sockets.data:
             selected_options.append(Cafe.has_sockets == True)
-        if form.has_toilet.data:
+        if form.can_take_calls.data:
             selected_options.append(Cafe.can_take_calls == True)
 
         # Apply the selected filter options to the query
@@ -149,7 +148,7 @@ def index():
                                    form=form,
                                    current_user=current_user,
                                    random=random_cafe,
-                                   phrases=phrases,)
+                                   phrases=phrases, )
     return render_template("index.html",
                            all_posts=cafe,
                            current_user=current_user,
