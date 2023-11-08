@@ -1,11 +1,11 @@
-from datetime import date
-from flask import Flask, abort, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from random import choice
 
 
 app = Flask(__name__)
@@ -86,7 +86,6 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        # This line will authenticate the user with Flask-Login
         login_user(new_user)
         return redirect(url_for("index"))
     return render_template("register.html", form=form, current_user=current_user)
@@ -98,13 +97,10 @@ def login():
     if form.validate_on_submit():
         password = form.password.data
         result = db.session.execute(db.select(User).where(User.email == form.email.data))
-        # Note, email in db is unique so will only have one result.
         user = result.scalar()
-        # Email doesn't exist
         if not user:
             flash("That email does not exist, please try again.")
             return redirect(url_for('login'))
-        # Password incorrect
         elif not check_password_hash(user.password, password):
             flash('Password incorrect, please try again.')
             return redirect(url_for('login'))
@@ -125,60 +121,37 @@ def logout():
 def index():
     result = db.session.execute(db.select(Cafe))
     cafe = result.scalars().all()
-    return render_template("index.html", all_posts=cafe, current_user=current_user)
+    random_cafe = choice(cafe)
+    return render_template("index.html", all_posts=cafe, current_user=current_user, random=random_cafe)
 
 
-# Use a decorator so only an admin user can create new posts
+@app.route("/post/<int:post_id>", methods=["GET", "POST"])
+def show_post(post_id):
+    requested_cafe = db.get_or_404(Cafe, post_id)
+    # Add the CommentForm to the route
+    return render_template("post.html", post=requested_cafe, current_user=current_user)
+
+
 @app.route("/new-post", methods=["GET", "POST"])
 def post_new_cafe():
     form = CreatePostForm()
     if form.validate_on_submit():
-        new_post = Cafe(
-            name=form.title.data,
-            map_url=form.subtitle.data,
-            img_url=form.body.data,
-            location=form.img_url.data,
-            has_sockets=current_user,
-            has_toilet=date.today().strftime("%B %d, %Y"),
-            can_take_calls=form.img_url.data,
-            seats=form.img_url.data,
-            coffee_price=form.img_url.data,
+        new_cafe = Cafe(
+            name=form.name.data,
+            map_url=form.map_url.data,
+            img_url=form.img_url.data,
+            location=form.location.data,
+            has_sockets=form.has_sockets.data,
+            has_wifi=form.has_wifi.data,
+            has_toilet=form.has_toilet.data,
+            can_take_calls=form.can_take_calls.data,
+            seats=form.seats.data,
+            coffee_price=form.coffee_price.data,
         )
-        db.session.add(new_post)
+        db.session.add(new_cafe)
         db.session.commit()
-        return redirect(url_for("get_all_posts"))
+        return redirect(url_for("index"))
     return render_template("make-post.html", form=form, current_user=current_user)
-
-
-# Use a decorator so only an admin user can edit a post
-@app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
-def edit_post(post_id):
-    post = db.get_or_404(Cafe, post_id)
-    edit_form = CreatePostForm(
-        title=post.title,
-        subtitle=post.subtitle,
-        img_url=post.img_url,
-        author=post.author,
-        body=post.body
-    )
-    if edit_form.validate_on_submit():
-        post.title = edit_form.title.data
-        post.subtitle = edit_form.subtitle.data
-        post.img_url = edit_form.img_url.data
-        post.author = current_user
-        post.body = edit_form.body.data
-        db.session.commit()
-        return redirect(url_for("show_post", post_id=post.id))
-    return render_template("make-post.html", form=edit_form, is_edit=True, current_user=current_user)
-
-
-# Use a decorator so only an admin user can delete a post
-@app.route("/delete/<int:post_id>")
-def delete_post(post_id):
-    post_to_delete = db.get_or_404(Cafe, post_id)
-    db.session.delete(post_to_delete)
-    db.session.commit()
-    return redirect(url_for('get_all_posts'))
 
 
 @app.route("/about")
