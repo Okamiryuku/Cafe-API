@@ -35,6 +35,9 @@ class LoginForm(FlaskForm):
 
 
 # Create a form to add comments
-class CommentForm(FlaskForm):
-    comment_text = CKEditorField("Comment", validators=[DataRequired()])
-    submit = SubmitField("Submit Comment")
+class Filter(FlaskForm):
+    has_toilet = BooleanField("Toilet")
+    has_wifi = BooleanField("WiFi")
+    has_sockets = BooleanField("Sockets")
+    can_take_calls = BooleanField("Calls")
+    submit = SubmitField("Filter")

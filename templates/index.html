@@ -1,3 +1,4 @@
+{% from "bootstrap5/form.html" import render_form %}
 {% include "header.html" %}
 
 <!-- Page Header-->
@@ -17,9 +18,16 @@
   </div>
 </header>
 <!-- Main Content-->
-<div class="container px-4 px-lg-5">
-  <div class="row gx-4 gx-lg-5 justify-content-center">
-    <div class="col-md-10 col-lg-8 col-xl-7">
+<!-- Filters-->
+<div class="container">
+  <div class="row justify-content-md-center">
+    <div class="col-md-3">
+      <!-- Filters-->
+      <br>
+      {{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+      <!-- End Filters -->
+    </div>
+    <div class="col-md-auto">
       <!-- Post preview-->
       {% for post in all_posts %}
       <div class="post-preview">
@@ -70,5 +78,10 @@
     </div>
   </div>
 </div>
+</div>
+</div>
+</div>
+
+
 
 {% include "footer.html" %}

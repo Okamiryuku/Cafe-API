@@ -1,10 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash,request
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from forms import CreatePostForm, RegisterForm, LoginForm, Filter
 from random import choice
 
 
@@ -122,17 +122,24 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def index():
+    form = Filter()
     result = db.session.execute(db.select(Cafe))
     cafe = result.scalars().all()
     random_cafe = choice(cafe)
     phrases = choice(lines)
+
+    if form.validate_on_submit():
+        option = form.has_toilet.data
+        print(option)
+
     return render_template("index.html",
                            all_posts=cafe,
                            current_user=current_user,
                            random=random_cafe,
-                           phrases=phrases)
+                           phrases=phrases,
+                           form=form)
 
 
 @app.route("/post/<int:post_id>", methods=["GET", "POST"])
