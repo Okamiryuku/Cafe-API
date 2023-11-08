@@ -23,40 +23,27 @@
       <!-- Post preview-->
       {% for post in all_posts %}
       <div class="post-preview">
-        <a href="{{ url_for('show_post', post_id=post.id) }}">
-          <h2 class="post-title">{{ post.title }}</h2>
-          <h3 class="post-subtitle">{{ post.subtitle }}</h3>
+        <a href="#">
+          <h2 class="post-title">{{ post.name }}</h2>
+          <h3 class="post-subtitle">{{ post.location }}</h3>
         </a>
         <p class="post-meta">
-          Posted by
-          <!-- post.author.name is now a User object -->
-          <a href="#">{{post.author.name}}</a>
+          Map by
+          <a href="#">{{post.map_url}}</a>
           on {{post.date}}
           <!-- Only show delete button if user id is 1 (admin user) -->
-          {% if current_user.id == 1: %}
-          <a href="{{url_for('delete_post', post_id=post.id) }}">✘</a>
-          {% endif %}
         </p>
       </div>
       <!-- Divider-->
       <hr class="my-4" />
       {% endfor %}
 
-      <!-- New Post -->
-      <!-- Only show Create Post button if user id is 1 (admin user) -->
-      {% if current_user.id == 1: %}
       <div class="d-flex justify-content-end mb-4">
         <a
           class="btn btn-primary float-right"
-          href="{{url_for('add_new_post')}}"
-          >Create New Post</a
+          href="{{url_for('post_new_cafe')}}"
+          >Add New Cafe</a
         >
-      </div>
-      {% endif %}
-
-      <!-- Pager-->
-      <div class="d-flex justify-content-end mb-4">
-        <a class="btn btn-secondary text-uppercase" href="#!">Older Posts →</a>
       </div>
     </div>
   </div>
