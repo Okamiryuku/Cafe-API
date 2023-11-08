@@ -131,9 +131,25 @@ def index():
     phrases = choice(lines)
 
     if form.validate_on_submit():
-        option = form.has_toilet.data
-        print(option)
+        selected_options = []
+        if form.has_wifi.data:
+            selected_options.append(Cafe.has_wifi == True)
+        if form.has_toilet.data:
+            selected_options.append(Cafe.has_toilet == True)
+        if form.has_toilet.data:
+            selected_options.append(Cafe.has_sockets == True)
+        if form.has_toilet.data:
+            selected_options.append(Cafe.can_take_calls == True)
 
+        # Apply the selected filter options to the query
+        if selected_options:
+            filtered_cafe = db.session.query(Cafe).filter(*selected_options).all()
+            return render_template("index.html",
+                                   all_posts=filtered_cafe,
+                                   form=form,
+                                   current_user=current_user,
+                                   random=random_cafe,
+                                   phrases=phrases,)
     return render_template("index.html",
                            all_posts=cafe,
                            current_user=current_user,
