@@ -186,15 +186,5 @@ def post_new_cafe():
     return render_template("make-post.html", form=form, current_user=current_user)
 
 
-@app.route("/about")
-def about():
-    return render_template("about.html", current_user=current_user)
-
-
-@app.route("/contact")
-def contact():
-    return render_template("contact.html", current_user=current_user)
-
-
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
