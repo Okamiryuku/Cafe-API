@@ -17,6 +17,11 @@ Bootstrap5(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+with open('static/phrases.txt', 'r') as file:
+    lines = file.readlines()
+
+lines = [line.strip() for line in lines]
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -122,7 +127,12 @@ def index():
     result = db.session.execute(db.select(Cafe))
     cafe = result.scalars().all()
     random_cafe = choice(cafe)
-    return render_template("index.html", all_posts=cafe, current_user=current_user, random=random_cafe)
+    phrases = choice(lines)
+    return render_template("index.html",
+                           all_posts=cafe,
+                           current_user=current_user,
+                           random=random_cafe,
+                           phrases=phrases)
 
 
 @app.route("/post/<int:post_id>", methods=["GET", "POST"])
